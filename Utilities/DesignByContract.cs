@@ -26,9 +26,11 @@
 //
 // Alternatively, you can define these in the project properties dialog.
 
-#if UNITY_EDITOR || ROBO_TEST_BUILD
-#define DBC_CHECK_ALL  
+#if UNITY_EDITOR || TESTBUILD
+#define NO_CONDITIONALS
 #endif
+
+// KK91: had some issues with the define not working properly in Unity, so for now will just compile out the Conditional attributes..
   
 using System;
 using System.Diagnostics;
@@ -89,10 +91,12 @@ namespace DesignByContract
 		/// <summary>
 		/// Precondition check.
 		/// </summary>
+#if !NO_CONDITIONALS
 		[Conditional("DBC_CHECK_ALL"), 
 		Conditional("DBC_CHECK_INVARIANT"), 
 		Conditional("DBC_CHECK_POSTCONDITION"), 
 		Conditional("DBC_CHECK_PRECONDITION")]
+#endif
 		public static void Require(bool assertion, string message)
 		{
 			if (UseExceptions) 
@@ -109,10 +113,12 @@ namespace DesignByContract
 		/// <summary>
 		/// Precondition check.
 		/// </summary>
+#if !NO_CONDITIONALS
 		[Conditional("DBC_CHECK_ALL"), 
 		Conditional("DBC_CHECK_INVARIANT"), 
 		Conditional("DBC_CHECK_POSTCONDITION"), 
 		Conditional("DBC_CHECK_PRECONDITION")]
+#endif
 		public static void Require(bool assertion, string message, Exception inner)
 		{
 			if (UseExceptions) 
@@ -129,10 +135,12 @@ namespace DesignByContract
 		/// <summary>
 		/// Precondition check.
 		/// </summary>
+#if !NO_CONDITIONALS
 		[Conditional("DBC_CHECK_ALL"),
 		Conditional("DBC_CHECK_INVARIANT"), 
 		Conditional("DBC_CHECK_POSTCONDITION"), 
 		Conditional("DBC_CHECK_PRECONDITION")]
+#endif
 		public static void Require(bool assertion)
 		{
 			if (UseExceptions) 
@@ -145,13 +153,15 @@ namespace DesignByContract
 				Trace.Assert(assertion, "Precondition failed.");
 			}
 		}
-		
+
 		/// <summary>
 		/// Postcondition check.
 		/// </summary>
+#if !NO_CONDITIONALS
 		[Conditional("DBC_CHECK_ALL"),
 		Conditional("DBC_CHECK_INVARIANT"), 
-		Conditional("DBC_CHECK_POSTCONDITION")] 
+		Conditional("DBC_CHECK_POSTCONDITION")]
+#endif
 		public static void Ensure(bool assertion, string message)
 		{
 			if (UseExceptions) 
@@ -168,9 +178,11 @@ namespace DesignByContract
 		/// <summary>
 		/// Postcondition check.
 		/// </summary>
+#if !NO_CONDITIONALS
 		[Conditional("DBC_CHECK_ALL"),
 		Conditional("DBC_CHECK_INVARIANT"), 
-		Conditional("DBC_CHECK_POSTCONDITION")] 
+		Conditional("DBC_CHECK_POSTCONDITION")]
+#endif
 		public static void Ensure(bool assertion, string message, Exception inner)
 		{
 			if (UseExceptions) 
@@ -187,9 +199,11 @@ namespace DesignByContract
 		/// <summary>
 		/// Postcondition check.
 		/// </summary>
+#if !NO_CONDITIONALS
 		[Conditional("DBC_CHECK_ALL"),
 		Conditional("DBC_CHECK_INVARIANT"), 
-		Conditional("DBC_CHECK_POSTCONDITION")] 
+		Conditional("DBC_CHECK_POSTCONDITION")]
+#endif
 		public static void Ensure(bool assertion)
 		{
 			if (UseExceptions) 
@@ -202,12 +216,14 @@ namespace DesignByContract
 				Trace.Assert(assertion, "Postcondition failed.");
 			}
 		}
-		
+
 		/// <summary>
 		/// Invariant check.
 		/// </summary>
+#if !NO_CONDITIONALS
 		[Conditional("DBC_CHECK_ALL"),
-		Conditional("DBC_CHECK_INVARIANT")] 
+		Conditional("DBC_CHECK_INVARIANT")]
+#endif
 		public static void Invariant(bool assertion, string message)
 		{
 			if (UseExceptions) 
@@ -224,8 +240,10 @@ namespace DesignByContract
 		/// <summary>
 		/// Invariant check.
 		/// </summary>
+#if !NO_CONDITIONALS
 		[Conditional("DBC_CHECK_ALL"),
-		Conditional("DBC_CHECK_INVARIANT")] 
+		Conditional("DBC_CHECK_INVARIANT")]
+#endif
 		public static void Invariant(bool assertion, string message, Exception inner)
 		{
 			if (UseExceptions) 
@@ -242,8 +260,10 @@ namespace DesignByContract
 		/// <summary>
 		/// Invariant check.
 		/// </summary>
+#if !NO_CONDITIONALS
 		[Conditional("DBC_CHECK_ALL"),
-		Conditional("DBC_CHECK_INVARIANT")] 
+		Conditional("DBC_CHECK_INVARIANT")]
+#endif
 		public static void Invariant(bool assertion)
 		{
 			if (UseExceptions) 
@@ -260,7 +280,9 @@ namespace DesignByContract
 		/// <summary>
 		/// Assertion check.
 		/// </summary>
+#if !NO_CONDITIONALS
 		[Conditional("DBC_CHECK_ALL")]
+#endif
 		public static void Assert(bool assertion, string message)
 		{
 			if (UseExceptions) 
@@ -277,7 +299,9 @@ namespace DesignByContract
 		/// <summary>
 		/// Assertion check.
 		/// </summary>
-		[Conditional("DBC_CHECK_ALL")] 
+#if !NO_CONDITIONALS
+		[Conditional("DBC_CHECK_ALL")]
+#endif
 		public static void Assert(bool assertion, string message, Exception inner)
 		{
 			if (UseExceptions) 
@@ -294,7 +318,9 @@ namespace DesignByContract
 		/// <summary>
 		/// Assertion check.
 		/// </summary>
+#if !NO_CONDITIONALS
 		[Conditional("DBC_CHECK_ALL")]
+#endif
 		public static void Assert(bool assertion)
 		{
 			if (UseExceptions) 
@@ -325,9 +351,9 @@ namespace DesignByContract
 			}
 		}
 		
-		#endregion // Interface
+#endregion // Interface
 
-		#region Implementation
+#region Implementation
 
 		// No creation
 		private Check() {}
@@ -347,7 +373,7 @@ namespace DesignByContract
 		// Default is to use exception handling.
 		private static bool useAssertions = false;
 
-		#endregion // Implementation
+#endregion // Implementation
 
 	} // End Check
 
@@ -359,11 +385,11 @@ namespace DesignByContract
             System.Diagnostics.Contracts.Contract.Assert(assertion, v);
 #else
             System.Diagnostics.Trace.Assert(assertion, v);
-#endif      
+#endif
         }
     }
 
-    #region Exceptions
+#region Exceptions
 
     /// <summary>
     /// Exception raised when a contract is broken.
@@ -454,6 +480,6 @@ namespace DesignByContract
 		public AssertionException(string message, Exception inner) : base(message, inner) {}
 	}
 
-	#endregion // Exception classes
+#endregion // Exception classes
 
 } // End Design By Contract
