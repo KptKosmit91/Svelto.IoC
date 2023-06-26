@@ -8,7 +8,7 @@ namespace Svelto.IoC
     {
         public WeakProviderDecorator(IProvider<T> provider)
         {
-            _reference = new WeakReference<IProvider<T>>(provider);
+            _reference = new DataStructures.WeakReference<IProvider<T>>(provider);
         }
         public bool Create(Type containerContract, PropertyInfo info, out object instance)
         {
@@ -23,6 +23,6 @@ namespace Svelto.IoC
 
         public Type contract { get { return _reference.IsValid ? _reference.Target.contract : null; } }
 
-        WeakReference<IProvider<T>> _reference;
+        DataStructures.WeakReference<IProvider<T>> _reference;
     }
 }

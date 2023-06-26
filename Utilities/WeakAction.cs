@@ -63,7 +63,7 @@ public class WeakAction : WeakActionBase
 
 public abstract class WeakActionBase
 {
-    protected readonly WeakReference<object> ObjectRef;
+    protected readonly Svelto.DataStructures.WeakReference<object> ObjectRef;
     protected readonly MethodInfo Method;
     
     public bool IsValid
@@ -77,7 +77,7 @@ public abstract class WeakActionBase
 
     public WeakActionBase(object listener, MethodInfo method)
     {
-        ObjectRef = new WeakReference<object>(listener);
+        ObjectRef = new Svelto.DataStructures.WeakReference<object>(listener);
         
         Method = method;
 

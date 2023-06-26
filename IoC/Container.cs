@@ -243,7 +243,7 @@ namespace Svelto.IoC
 
         readonly Dictionary<Type, MemberInfo[]>     _cachedProperties;
         readonly MemberFilter                       _delegateToSearchCriteria;
-        readonly Type                               _weakReferenceType = typeof(WeakReference<>);
+        readonly Type                               _weakReferenceType = typeof(DataStructures.WeakReference<>);
 
         IProviderContainer                          _providers;
 
