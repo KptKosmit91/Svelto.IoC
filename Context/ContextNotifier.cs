@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using WeakReferenceI = Svelto.DataStructures.WeakReference<Svelto.Context.IWaitForFrameworkInitialization>;
-using WeakReferenceD = Svelto.DataStructures.WeakReference<Svelto.Context.IWaitForFrameworkDestruction>;
+using WeakReferenceI = Svelto.DataStructures.HashableWeakRef<Svelto.Context.IWaitForFrameworkInitialization>;
+using WeakReferenceD = Svelto.DataStructures.HashableWeakRef<Svelto.Context.IWaitForFrameworkDestruction>;
 
 namespace Svelto.Context
 {
@@ -9,8 +9,8 @@ namespace Svelto.Context
     {
         public ContextNotifier()
         {
-            _toInitialize = new List<WeakReferenceI>();
-            _toDeinitialize = new List<WeakReferenceD>();
+            _toInitialize = new HashSet<WeakReferenceI>();
+            _toDeinitialize = new HashSet<WeakReferenceD>();
         }
 
         public void AddFrameworkDestructionListener(IWaitForFrameworkDestruction obj)
@@ -34,10 +34,12 @@ namespace Svelto.Context
         /// </summary>
         public void NotifyFrameworkDeinitialized()
         {
-            for (var i = _toDeinitialize.Count - 1; i >= 0; --i)
+
+            //for (var i = _toDeinitialize.Count - 1; i >= 0; --i)
+            foreach (var obj in _toDeinitialize)
                 try
                 {
-                    var obj = _toDeinitialize[i];
+                    //var obj = _toDeinitialize[i];
                     if (obj.IsAlive)
                         obj.Target.OnFrameworkDestroyed();
                 }
@@ -54,22 +56,23 @@ namespace Svelto.Context
         /// </summary>
         public void NotifyFrameworkInitialized()
         {
-            for (var i = _toInitialize.Count - 1; i >= 0; --i)
-                try
-                {
-                    var obj = _toInitialize[i];
-                    if (obj.IsAlive)
-                        obj.Target.OnFrameworkInitialized();
-                }
-                catch (Exception e)
-                {
-                    Utility.Console.LogException(e);
-                }
+            //for (var i = _toInitialize.Count - 1; i >= 0; --i)
+            foreach(var obj in _toInitialize)
+            try
+            {
+                //var obj = _toInitialize[i];
+                if (obj.IsAlive)
+                    obj.Target.OnFrameworkInitialized();
+            }
+            catch (Exception e)
+            {
+                Utility.Console.LogException(e);
+            }
 
             _toInitialize = null;
         }
 
-        List<WeakReferenceD> _toDeinitialize;
-        List<WeakReferenceI> _toInitialize;
+        HashSet<WeakReferenceD> _toDeinitialize;
+        HashSet<WeakReferenceI> _toInitialize;
     }
 }
