@@ -1,13 +1,7 @@
-[Deprecated] Svelto IoC container for Unity 3D
+Svelto IoC container for Unity 3D
 =====================================
 
-Svelto IoC Container is the evolution of my first IoC container that I created as Proof of concept. Svelto IoC is extensively used in the project I am working on Robocraft (http://www.robocraftgame.com)
-
-Please read my blog post for more information: http://www.sebaslab.com/svelto-inversion-of-control-container/
-
-The ad hoc example can be found here: https://github.com/sebas77/Svelto.Ioc.Example
-
-**Note: since I wrote this project, I changed my mind about using an IoC Container. Nowadays I would use it only and exclusively as support tool for a GUI framework. However, without the hierarchical container feature, it wouldn't be useful for that either. I may add the hierarchical container feature one day, but not any time soon. Today I use mainly the Svelto.ECS (https://github.com/sebas77/Svelto.ECS) pattern for my projects. An IoC container can lead to severe design issues, as I am going to write on a new article when I have time. The example is also quite old (I wrote it in 2012 and never updated it) and shows how awkward the code could get. In this case, the dependencies are mainly managers, which are way better handled by the Svelto ECS pattern. If you still want to use an IoC container, please use ZenInject or Strange.IoC**
+A fork of Svelto.IoC. The original is deprecated, but I am experimenting with some stuff here.
 
 License
 =====================================
