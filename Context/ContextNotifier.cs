@@ -34,7 +34,6 @@ namespace Svelto.Context
         /// </summary>
         public void NotifyFrameworkDeinitialized()
         {
-
             //for (var i = _toDeinitialize.Count - 1; i >= 0; --i)
             foreach (var obj in _toDeinitialize)
                 try
