@@ -1,44 +1,46 @@
 using System.Collections;
-using Svelto.Context;
 using UnityEngine;
 
-public abstract class UnityContext : MonoBehaviour
+namespace Svelto.Context.Unity
 {
-    protected abstract void OnAwake();
-
-    void Awake()
+    public abstract class UnityContext : MonoBehaviour
     {
-        OnAwake();
-    }
-}
+        protected abstract void OnAwake();
 
-public class UnityContext<T>: UnityContext where T:class, ICompositionRoot, new()
-{
-    protected override void OnAwake()
-    {
-        _applicationRoot = new T();
-
-        _applicationRoot.OnContextCreated(this);
+        void Awake()
+        {
+            OnAwake();
+        }
     }
 
-    void OnDestroy()
+    public class UnityContext<T> : UnityContext where T : class, ICompositionRoot, new()
     {
-        _applicationRoot.OnContextDestroyed();
+        protected override void OnAwake()
+        {
+            _root = new T();
+
+            _root.OnContextCreated(this);
+        }
+
+        void OnDestroy()
+        {
+            _root.OnContextDestroyed();
+        }
+
+        void Start()
+        {
+            if (Application.isPlaying == true)
+                StartCoroutine(WaitForFrameworkInitialization());
+        }
+
+        IEnumerator WaitForFrameworkInitialization()
+        {
+            //let's wait until the end of the frame, so we are sure that all the awake and starts are called
+            yield return new WaitForEndOfFrame();
+
+            _root.OnContextInitialized();
+        }
+
+        T _root;
     }
-
-    void Start()
-    {
-        if (Application.isPlaying == true)
-            StartCoroutine(WaitForFrameworkInitialization());
-    }
-
-    IEnumerator WaitForFrameworkInitialization()
-    {
-        //let's wait until the end of the frame, so we are sure that all the awake and starts are called
-        yield return new WaitForEndOfFrame();
-
-        _applicationRoot.OnContextInitialized();
-    }
-
-    T _applicationRoot;
 }

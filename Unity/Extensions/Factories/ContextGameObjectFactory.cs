@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using Svelto.IoC;
+using UnityEngine;
 
-namespace Svelto.IoC
+namespace Svelto.Context
 {
-    public class ContextGameObjectFactory : Context.GameObjectFactory
+    public class ContextGameObjectFactory : GameObjectFactory
     {
         public ContextGameObjectFactory(IContainer container):base()
         {
@@ -11,6 +12,8 @@ namespace Svelto.IoC
 
         override public GameObject Build(GameObject prefab)
         {
+            DesignByContract.Check.Require(prefab != null, "Svelto.Factories.IGameObjectFactory -null prefab");
+
             var copy =  base.Build(prefab);
             var monobehaviours = copy.GetComponentsInChildren<MonoBehaviour>();
 

@@ -1,4 +1,4 @@
-namespace Svelto.Context
+namespace Svelto.Context.Unity
 {
     public interface ICompositionRoot
     {

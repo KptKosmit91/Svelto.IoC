@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Svelto.IoC;
+using System;
 
-namespace Svelto.IoC
+namespace Svelto.Context
 {
-    public class ContextMonoBehaviourFactory : Context.MonoBehaviourFactory
+    public class ContextMonoBehaviourFactory : MonoBehaviourFactory
     {
         public ContextMonoBehaviourFactory(IContainer container):base()
         {
