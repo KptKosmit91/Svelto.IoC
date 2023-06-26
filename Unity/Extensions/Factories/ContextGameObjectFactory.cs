@@ -2,9 +2,9 @@
 
 namespace Svelto.IoC
 {
-    public class GameObjectFactory : Context.GameObjectFactory
+    public class ContextGameObjectFactory : Context.GameObjectFactory
     {
-        public GameObjectFactory(IContainer container):base()
+        public ContextGameObjectFactory(IContainer container):base()
         {
             _container = container;
         }

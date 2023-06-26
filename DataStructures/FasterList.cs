@@ -320,7 +320,7 @@ namespace Svelto.DataStructures
             _buffer[_count++] = item;
         }
 
-        public static FasterList<T> PreFill<U>(int initialSize) where U:T, new()
+        public static FasterList<T> PreFill<U>(int initialSize) where U : T, new()
         {
             var list = new FasterList<T>(initialSize);
 
@@ -373,8 +373,8 @@ namespace Svelto.DataStructures
         }
 
         /// <summary>
-        /// Careful, you could keep on holding references you don't want to hold to anymore
-        /// Use DeepClear in case.
+        /// Careful, you could keep on holding references you don't want to hold to anymore.
+        /// Use <c>DeepClear</c> in case.
         /// </summary>
         public void Clear()
         {
@@ -546,18 +546,26 @@ namespace Svelto.DataStructures
             var newList = new T[Mathf.Max(_buffer.Length << 1, MIN_SIZE)];
             if (_count > 0) _buffer.CopyTo(newList, 0);
             _buffer = newList;
+
+            // Utility.Console.LogError($"Allocating more to list. Size: {_buffer.Length}");
         }
 
         void AllocateMore(int newSize)
         {
             var oldLength = Mathf.Max(_buffer.Length, MIN_SIZE);
+            var newLength = oldLength;
 
-            while (oldLength < newSize)
-                oldLength <<= 1;
+            while (newLength < newSize)
+                newLength <<= 1;
 
-            var newList = new T[oldLength];
-            if (_count > 0) Array.Copy(_buffer, newList, _count);
-            _buffer = newList;
+            if (newLength != oldLength)
+            {
+                var newList = new T[newLength];
+                if (_count > 0) Array.Copy(_buffer, newList, _count);
+                _buffer = newList;
+
+                // Utility.Console.LogError($"Allocating more to list. Size: {_buffer.Length}");
+            }
         }
 
         public void Trim()
@@ -576,6 +584,74 @@ namespace Svelto.DataStructures
             result = _buffer[index];
 
             return result != null;
+        }
+
+        /// <summary>
+        /// KK91: Custom function. Allows for quick iteration of the list.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <exception cref="NullReferenceException">If the <c>action</c> provided was null</exception>
+        public void ForEach(Action<T> action)
+        {
+            if (action == null) throw new NullReferenceException();
+
+            for (int i = 0; i < _count; ++i)
+            {
+                action(_buffer[i]);
+            }
+        }
+
+        /// <summary>
+        /// KK91: Custom function. Allows for quick iteration of the list.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <exception cref="NullReferenceException">If the <c>action</c> provided was null</exception>
+        public void ForEach(Action<T, int> action)
+        {
+            if (action == null) throw new NullReferenceException();
+
+            for (int i = 0; i < _count; ++i)
+            {
+                action(_buffer[i], i);
+            }
+        }
+
+        /// <summary>
+        /// KK91: Same as ForEach, but with an added check to skip execution for null objects that may be in the list.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <exception cref="NullReferenceException">If the <c>action</c> provided was null</exception>
+        public void ForEachNonNull(Action<T> action)
+        {
+            if (action == null) throw new NullReferenceException();
+
+            for (int i = 0; i < _count; ++i)
+            {
+                var obj = _buffer[i];
+                if (obj != null)
+                {
+                    action(obj);
+                }
+            }
+        }
+
+        /// <summary>
+        /// KK91: Same as ForEach, but with an added check to skip execution for null objects that may be in the list.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <exception cref="NullReferenceException">If the <c>action</c> provided was null</exception>
+        public void ForEachNonNull(Action<T, int> action)
+        {
+            if (action == null) throw new NullReferenceException();
+
+            for (int i = 0; i < _count; ++i)
+            {
+                var obj = _buffer[i];
+                if (obj != null)
+                {
+                    action(obj, i);
+                }
+            }
         }
 
         T[] _buffer;

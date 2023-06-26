@@ -1,0 +1,16 @@
+{
+    "name": "Svelto.IoC.Unity",
+    "rootNamespace": "",
+    "references": [
+        "GUID:c2760c3224103f1419d0883ca1a3e1dd"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

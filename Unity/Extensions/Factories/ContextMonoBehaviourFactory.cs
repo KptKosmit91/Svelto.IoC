@@ -2,9 +2,9 @@
 
 namespace Svelto.IoC
 {
-    public class MonoBehaviourFactory : Context.MonoBehaviourFactory
+    public class ContextMonoBehaviourFactory : Context.MonoBehaviourFactory
     {
-        public MonoBehaviourFactory(IContainer container):base()
+        public ContextMonoBehaviourFactory(IContainer container):base()
         {
             _container = container;
         }

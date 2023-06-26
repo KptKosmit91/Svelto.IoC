@@ -2,7 +2,7 @@ using System.Collections;
 using Svelto.Context;
 using UnityEngine;
 
-public abstract class UnityContext:MonoBehaviour
+public abstract class UnityContext : MonoBehaviour
 {
     protected abstract void OnAwake();
 
