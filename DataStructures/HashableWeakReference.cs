@@ -4,7 +4,7 @@ namespace Svelto.DataStructures
 {
     class HashableWeakRef<T> : IEquatable<HashableWeakRef<T>> where T : class
     {
-        public bool isAlive { get { return _weakRef.IsAlive; } }
+        public bool IsAlive { get { return _weakRef.IsAlive; } }
         public T Target { get { return (T)_weakRef.Target; } }
 
         public HashableWeakRef(T target)
@@ -52,5 +52,9 @@ namespace Svelto.DataStructures
 
         int             _hash;
         WeakReference   _weakRef;
+
+
+        [Obsolete("Use IsAlive instead")]
+        public bool isAlive => IsAlive;
     }
 }
