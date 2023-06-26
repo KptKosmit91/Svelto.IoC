@@ -17,7 +17,8 @@ namespace Svelto.Context
             var copy =  base.Build(prefab);
             var monobehaviours = copy.GetComponentsInChildren<MonoBehaviour>();
 
-            for (int i = 0; i < monobehaviours.Length; i++)
+            int len = monobehaviours.Length;
+            for (int i = 0; i < len; ++i)
                 _container.Inject(monobehaviours[i]);
 
             return copy;
