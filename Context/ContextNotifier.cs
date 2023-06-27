@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
-using WeakReferenceI = Svelto.DataStructures.HashableWeakRef<Svelto.Context.IOnFrameworkInitialized>;
-using WeakReferenceD = Svelto.DataStructures.HashableWeakRef<Svelto.Context.IOnFrameworkDestroyed>;
 
 namespace Svelto.Context
 {
+    using WeakReferenceI = DataStructures.HashableWeakRef<IOnFrameworkInitialized>;
+    using WeakReferenceD = DataStructures.HashableWeakRef<IOnFrameworkDestroyed>;
+
     public class ContextNotifier : IContextNotifer
     {
         public ContextNotifier()
