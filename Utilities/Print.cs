@@ -96,6 +96,8 @@ public static class FastConcatUtility
 
 namespace Utility
 {
+    // TODO: Logger implementation of Exception
+
     /// <summary>
     /// Error, Warning, Log and Exception int values correspond to UnityEngine's LogType enum values.
     /// </summary>
@@ -106,10 +108,8 @@ namespace Utility
         Log = 3,
         Exception = 4,
 
-        DebugError = 0 + 10,
         DebugWarning = 2 + 10,
         DebugLog = 3 + 10,
-        DebugException = 4 + 10
     }
 
     public interface ILogger
@@ -127,6 +127,14 @@ namespace Utility
         public static void Log(string txt)
         {
             logger.Log(txt);
+        }
+
+        [Conditional("DEBUG")]
+        [Conditional("PRINTDEBUG")]
+        [Conditional("UNITY_EDITOR")]
+        public static void LogDebug(string txt)
+        {
+            logger.Log(txt, type: LogMessageType.DebugLog);
         }
 
         public static void LogError(string txt, bool showCurrentStack = true)
@@ -207,6 +215,25 @@ namespace Utility
             logger.Log(toPrint, null, LogMessageType.Warning);
         }
 
+        [Conditional("DEBUG")]
+        [Conditional("PRINTDEBUG")]
+        [Conditional("UNITY_EDITOR")]
+        public static void LogWarningDebug(string txt)
+        {
+            string toPrint;
+
+            lock (_stringBuilder)
+            {
+                _stringBuilder.Length = 0;
+                _stringBuilder.Append("------> ");
+                _stringBuilder.Append(txt);
+
+                toPrint = _stringBuilder.ToString();
+            }
+
+            logger.Log(toPrint, null, LogMessageType.DebugWarning);
+        }
+
         /// <summary>
         /// Use this function if you don't want the message to be batched
         /// </summary>
@@ -262,9 +289,6 @@ namespace Utility
                     System.Console.WriteLine(stack != null ? Debug.FastConcat(txt, stack) : Debug.FastConcat(txt));
                 break;
                 case LogMessageType.DebugWarning:
-                    System.Console.WriteLine(stack != null ? Debug.FastConcat(txt, stack) : Debug.FastConcat(txt));
-                break;
-                case LogMessageType.DebugError:
                     System.Console.WriteLine(stack != null ? Debug.FastConcat(txt, stack) : Debug.FastConcat(txt));
                 break;
 #endif

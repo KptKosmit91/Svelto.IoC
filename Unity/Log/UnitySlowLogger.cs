@@ -29,9 +29,6 @@ namespace Svelto.Unity.Log
                 case LogMessageType.DebugWarning:
                     UnityEngine.Debug.LogWarning(stack != null ? Debug.FastConcat(txt, stack) : Debug.FastConcat(txt));
                 break;
-                case LogMessageType.DebugError:
-                    UnityEngine.Debug.LogError(stack != null ? Debug.FastConcat(txt, stack) : Debug.FastConcat(txt));
-                break;
 #endif
             }
         }
