@@ -158,9 +158,11 @@ namespace Svelto.IoC
 
         void InjectProperty(object instanceToFullfill, PropertyInfo info, Type contract)
         {
-            if (info.PropertyType == typeof (IContainer)) //self inject
+            if (info.PropertyType == typeof (IContainer)) // self inject
             {
-                Utility.Console.LogWarning("Inject containers automatically is considered a design error");
+#if DEBUG || TESTBUILD
+                Utility.Console.LogWarning($"Inject containers automatically is considered a design error. [in {instanceToFullfill.GetType()}]");
+#endif
 
                 info.SetValue(instanceToFullfill, this, null);
             }
