@@ -1,3 +1,4 @@
+using Svelto.Unity.Log;
 using System.Collections;
 using UnityEngine;
 
@@ -9,6 +10,11 @@ namespace Svelto.Context.Unity
 
         void Awake()
         {
+            if (Utility.Console.logger == null || Utility.Console.logger is UnitySlowLogger == false)
+            {
+                Utility.Console.logger = new UnitySlowLogger();
+            }
+
             OnAwake();
         }
     }
