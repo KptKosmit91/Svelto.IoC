@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using WeakReferenceI = Svelto.DataStructures.HashableWeakRef<Svelto.Context.IWaitForFrameworkInitialization>;
-using WeakReferenceD = Svelto.DataStructures.HashableWeakRef<Svelto.Context.IWaitForFrameworkDestruction>;
+using WeakReferenceI = Svelto.DataStructures.HashableWeakRef<Svelto.Context.IOnFrameworkInitialized>;
+using WeakReferenceD = Svelto.DataStructures.HashableWeakRef<Svelto.Context.IOnFrameworkDestroyed>;
 
 namespace Svelto.Context
 {
@@ -13,7 +13,7 @@ namespace Svelto.Context
             _toDeinitialize = new HashSet<WeakReferenceD>();
         }
 
-        public void AddFrameworkDestructionListener(IWaitForFrameworkDestruction obj)
+        public void AddFrameworkDestructionListener(IOnFrameworkDestroyed obj)
         {
             if (_toDeinitialize != null)
                 _toDeinitialize.Add(new WeakReferenceD(obj));
@@ -21,7 +21,7 @@ namespace Svelto.Context
                 throw new Exception("An object is expected to be initialized after the framework has been deinitialized. Type: " + obj.GetType());
         }
 
-        public void AddFrameworkInitializationListener(IWaitForFrameworkInitialization obj)
+        public void AddFrameworkInitializationListener(IOnFrameworkInitialized obj)
         {
             if (_toInitialize != null)
                 _toInitialize.Add(new WeakReferenceI(obj));

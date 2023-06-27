@@ -16,11 +16,11 @@ namespace Svelto.IoC.Extensions.Context
 
         override protected void OnInstanceGenerated<TContractor>(TContractor instance)
         {
-            if (instance is IWaitForFrameworkInitialization)
-                _contextNotifier.AddFrameworkInitializationListener(instance as IWaitForFrameworkInitialization);
+            if (instance is IOnFrameworkInitialized)
+                _contextNotifier.AddFrameworkInitializationListener(instance as IOnFrameworkInitialized);
 
-            if (instance is IWaitForFrameworkDestruction)
-                _contextNotifier.AddFrameworkDestructionListener(instance as IWaitForFrameworkDestruction);
+            if (instance is IOnFrameworkDestroyed)
+                _contextNotifier.AddFrameworkDestructionListener(instance as IOnFrameworkDestroyed);
         }
 
         IContextNotifer _contextNotifier;
