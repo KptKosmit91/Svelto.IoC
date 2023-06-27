@@ -1,6 +1,6 @@
 namespace Svelto.Command
 {
-    interface ICommandFactory
+    public interface ICommandFactory
     {
         TCommand Build<TCommand>() where TCommand : ICommand, new();
     }

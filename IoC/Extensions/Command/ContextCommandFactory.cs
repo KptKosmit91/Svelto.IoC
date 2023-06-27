@@ -2,11 +2,9 @@ using Svelto.Command;
 
 namespace Svelto.IoC
 {
-    public class CommandFactory:ICommandFactory
+    public class ContextCommandFactory : ICommandFactory
     {
-        [Inject] public IContainer container { set; private get; }
-
-        public CommandFactory()
+        public ContextCommandFactory(IContainer container)
         {
             _commandFactory = new Command.CommandFactory(cmd => container.Inject(cmd));
         }
