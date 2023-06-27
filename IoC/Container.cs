@@ -38,8 +38,8 @@ namespace Svelto.IoC
 
             TContractor instance = Get(contract) as TContractor;
 
-            DesignByContract.Check.Ensure(instance != null, "IoC.Container instance failed to be built (contractor not found - must be registered)");
-            
+            DesignByContract.Check.Ensure(instance != null, $"IoC.Container instance for type {contract} failed to be built (contractor not found - must be registered)");
+
             return instance;
         }
 
