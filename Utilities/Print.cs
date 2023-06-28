@@ -267,7 +267,7 @@ namespace Utility
     public class SystemConsoleLogger : ILogger
     {
 #if DEBUG || UNITY_EDITOR || PRINTDEBUG
-        readonly static string Debug = "[DEBUG] ";
+        readonly string Debug = "[DEBUG] ";
 #endif
 
         public void Log(string txt, string stack = null, LogMessageType type = LogMessageType.Log)
