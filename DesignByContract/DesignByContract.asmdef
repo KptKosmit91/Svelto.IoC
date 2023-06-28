@@ -1,6 +1,6 @@
 {
     "name": "DesignByContract",
-    "rootNamespace": "",
+    "rootNamespace": "DesignByContract",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
