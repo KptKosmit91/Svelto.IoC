@@ -237,9 +237,9 @@ namespace Svelto.IoC
                 if (fullfill != null)
                     fullfill.OnDependenciesInjected();
             }
-            catch (Exception e)
+            catch (Exception innerException)
             {
-                Utility.Console.LogException(new Exception("OnDependenciesInjected Crashes inside " + instanceToFullfill.GetType(), e));
+                throw new InjectException("OnDependenciesInjected Crashes inside " + instanceToFullfill.GetType(), innerException);
             }
         }
 
