@@ -6,8 +6,6 @@ namespace Svelto.Context.Unity
 {
     public class ContextMonoBehaviourFactory : MonoBehaviourFactory
     {
-        IMonoBehaviourRoot _mbRoot;
-
         public ContextMonoBehaviourFactory(IContainer container) : base()
         {
             _container = container;
@@ -39,7 +37,9 @@ namespace Svelto.Context.Unity
 
             return copy;
         }
- 
-        IContainer _container;
+
+        readonly IMonoBehaviourRoot _mbRoot;
+
+        readonly IContainer _container;
     }
 }

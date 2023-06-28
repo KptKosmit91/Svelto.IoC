@@ -37,6 +37,6 @@ namespace Svelto.Command
                 _onNewCommand(command);
         }
 
-        Action<ICommand>    _onNewCommand;
+       readonly Action<ICommand>    _onNewCommand;
     }
 }

@@ -6,8 +6,6 @@ namespace Svelto.Context.Unity
 {
     public class ContextGameObjectFactory : GameObjectFactory
     {
-        IMonoBehaviourRoot _mbRoot;
-
         public ContextGameObjectFactory(IContainer container) : base()
         {
             _container = container;
@@ -50,8 +48,9 @@ namespace Svelto.Context.Unity
 
             return copy;
         }
-        
 
-        IContainer _container;
+        readonly IMonoBehaviourRoot _mbRoot;
+
+        readonly IContainer _container;
     }
 }

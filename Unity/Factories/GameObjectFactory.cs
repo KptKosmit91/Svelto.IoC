@@ -60,6 +60,6 @@ namespace Svelto.Context
             _prefabs.Add(prefabName, objects);
         }
 
-        Dictionary<string, GameObject[]>                        _prefabs;
+        readonly Dictionary<string, GameObject[]>                        _prefabs;
     }
 }
