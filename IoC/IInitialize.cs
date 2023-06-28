@@ -4,7 +4,7 @@ using System;
 namespace Svelto.IoC
 {
 #endif
-	interface IInitialize
+	public interface IInitialize
 	{
 		void OnDependenciesInjected();
 	}
