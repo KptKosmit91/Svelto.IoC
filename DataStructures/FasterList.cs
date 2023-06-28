@@ -434,6 +434,11 @@ namespace Svelto.DataStructures
             _buffer = null;
         }
 
+        public bool IsReleased()
+        {
+            return _buffer == null;
+        }
+
         public bool Remove(T item)
         {
             var index = IndexOf(item);
