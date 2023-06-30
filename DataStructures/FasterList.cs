@@ -353,7 +353,7 @@ namespace Svelto.DataStructures
 
         public void AddRange(FasterList<T> items)
         {
-            AddRange(items.ToArrayFast(), items.Count);
+            AddRange(items.ToArrayFast(), items._count);
         }
 
         public void AddRange(T[] items, int count)
@@ -397,12 +397,12 @@ namespace Svelto.DataStructures
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            Array.Copy(_buffer, 0, array, arrayIndex, Count);
+            Array.Copy(_buffer, 0, array, arrayIndex, _count);
         }
 
         public FasterListEnumerator<T> GetEnumerator()
         {
-            return new FasterListEnumerator<T>(_buffer, Count);
+            return new FasterListEnumerator<T>(_buffer, _count);
         }
 
         public int IndexOf(T item)
