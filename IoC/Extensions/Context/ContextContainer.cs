@@ -1,6 +1,7 @@
 #region
 
 using System;
+using System.Collections.Generic;
 using Svelto.Context;
 
 #endregion
@@ -9,6 +10,52 @@ namespace Svelto.IoC.Extensions.Context
 {
     public class ContextContainer : Container
     {
+        /// <summary>
+        /// Handles init/deinit for all bound classes that inherit IOnFrameworkInitialized or IOnFrameworkDestroyed
+        /// </summary>
+        private class NotifierWrapper : IOnFrameworkInitialized, IOnFrameworkDestroyed
+        {
+            ContextContainer _c;
+
+            List<Type> _toInit = new List<Type>();
+            List<Type> _toDeInit = new List<Type>();
+
+            public NotifierWrapper(ContextContainer c)
+            {
+                _c = c;
+            }
+
+            public void AddInitType(Type type)
+            {
+                _toInit.Add(type);
+            }
+
+            public void AddDeInitType(Type type)
+            {
+                _toDeInit.Add(type);
+            }
+
+            public void OnFrameworkInitialized()
+            {
+                foreach (Type t in _toInit)
+                {
+                    var instance = _c.Get(t);
+                    ((IOnFrameworkInitialized)instance).OnFrameworkInitialized();
+                }
+                _toInit = null;
+            }
+
+            public void OnFrameworkDestroyed()
+            {
+                foreach (Type t in _toDeInit)
+                {
+                    var instance = _c.Get(t);
+                    ((IOnFrameworkDestroyed)instance).OnFrameworkDestroyed();
+                }
+                _toDeInit = null;
+            }
+        }
+
         private class ContextBinder<Contractor> : IBinder<Contractor> where Contractor : class
         {
             private Action<Type> _onRegister;
@@ -55,9 +102,15 @@ namespace Svelto.IoC.Extensions.Context
             }
         }
 
+        private NotifierWrapper _notifierWrapper;
+
         public ContextContainer(IContextNotifer contextNotifier)
         {
+            _notifierWrapper = new NotifierWrapper(this);
             _contextNotifier = contextNotifier;
+
+            _contextNotifier.AddFrameworkInitializationListener(_notifierWrapper);
+            _contextNotifier.AddFrameworkDestructionListener(_notifierWrapper);
         }
 
         protected override IBinder<TContractor> BinderProvider<TContractor>()
@@ -67,10 +120,17 @@ namespace Svelto.IoC.Extensions.Context
 
         private void AddType(Type type)
         {
-            var instance = Get(type);
-            OnInstanceGenerated(instance);
+            if (typeof(IOnFrameworkInitialized).IsAssignableFrom(type)) 
+            {
+                _notifierWrapper.AddInitType(type);
+            }
+            if (typeof(IOnFrameworkDestroyed).IsAssignableFrom(type)) 
+            {
+                _notifierWrapper.AddDeInitType(type);
+            }
         }
 
+        /*
         override protected void OnInstanceGenerated<TContractor>(TContractor instance)
         {
             if (instance is IOnFrameworkInitialized)
@@ -79,6 +139,7 @@ namespace Svelto.IoC.Extensions.Context
             if (instance is IOnFrameworkDestroyed)
                 _contextNotifier.AddFrameworkDestructionListener(instance as IOnFrameworkDestroyed);
         }
+        */
 
         IContextNotifer _contextNotifier;
     }
