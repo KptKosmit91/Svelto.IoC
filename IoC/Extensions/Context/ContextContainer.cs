@@ -13,7 +13,7 @@ namespace Svelto.IoC.Extensions.Context
         /// <summary>
         /// Handles init/deinit for all bound classes that inherit IOnFrameworkInitialized or IOnFrameworkDestroyed
         /// </summary>
-        private class NotifierWrapper : IOnFrameworkInitialized, IOnFrameworkDestroyed
+        protected class NotifierWrapper : IOnFrameworkInitialized, IOnFrameworkDestroyed
         {
             ContextContainer _c;
 
@@ -102,7 +102,7 @@ namespace Svelto.IoC.Extensions.Context
             }
         }
 
-        private NotifierWrapper _notifierWrapper;
+        protected NotifierWrapper _notifierWrapper;
 
         public ContextContainer(IContextNotifer contextNotifier)
         {
@@ -118,7 +118,7 @@ namespace Svelto.IoC.Extensions.Context
             return new ContextBinder<TContractor>(AddType);
         }
 
-        private void AddType(Type type)
+        protected virtual void AddType(Type type)
         {
             if (typeof(IOnFrameworkInitialized).IsAssignableFrom(type)) 
             {
