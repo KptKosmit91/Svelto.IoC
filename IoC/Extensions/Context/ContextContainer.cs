@@ -58,14 +58,18 @@ namespace Svelto.IoC.Extensions.Context
 
         private class ContextBinder<Contractor> : IBinder<Contractor> where Contractor : class
         {
-            private Action<Type> _onRegister;
+            public delegate void RegisterCallback(Type interfaceType, Type implementationType);
+
+            private RegisterCallback _onRegister;
 
             private IInternalContainer _container;
 
             private Type _interfaceType;
 
-            public ContextBinder(Action<Type> onRegister)
+            public ContextBinder(RegisterCallback onRegister)
             {
+                DesignByContract.Check.Require(onRegister != null, "onRegister callback was null");
+
                 _onRegister = onRegister;
             }
 
@@ -95,10 +99,14 @@ namespace Svelto.IoC.Extensions.Context
 
             private void OnRegister(Type implementationType)
             {
+                _onRegister(_interfaceType, implementationType);
+
+                /*
                 if (typeof(IOnFrameworkInitialized).IsAssignableFrom(implementationType) || typeof(IOnFrameworkDestroyed).IsAssignableFrom(implementationType))
                 {
                     _onRegister(_interfaceType);
                 }
+                */
             }
         }
 
@@ -118,15 +126,15 @@ namespace Svelto.IoC.Extensions.Context
             return new ContextBinder<TContractor>(AddType);
         }
 
-        protected virtual void AddType(Type type)
+        protected virtual void AddType(Type interfaceType, Type implementationType)
         {
-            if (typeof(IOnFrameworkInitialized).IsAssignableFrom(type)) 
+            if (typeof(IOnFrameworkInitialized).IsAssignableFrom(implementationType))
             {
-                _notifierWrapper.AddInitType(type);
+                _notifierWrapper.AddInitType(interfaceType);
             }
-            if (typeof(IOnFrameworkDestroyed).IsAssignableFrom(type)) 
+            if (typeof(IOnFrameworkDestroyed).IsAssignableFrom(implementationType))
             {
-                _notifierWrapper.AddDeInitType(type);
+                _notifierWrapper.AddDeInitType(interfaceType);
             }
         }
 
