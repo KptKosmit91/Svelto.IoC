@@ -6,6 +6,42 @@ public static class FastConcatUtility
 {
     static readonly StringBuilder _stringBuilder = new StringBuilder(256);
 
+    public static string FastConcatLoop(this string str1, params string[] strList)
+    {
+        lock (_stringBuilder)
+        {
+            int count = strList.Length;
+
+            _stringBuilder.Length = 0;
+
+            _stringBuilder.Append(str1);
+            for (int i = 0; i < count; i++)
+            {
+                _stringBuilder.Append(strList[i]);
+            }
+
+            return _stringBuilder.ToString();
+        }
+    }
+
+    public static string FastConcatLoop(this string str1, params object[] strList)
+    {
+        lock (_stringBuilder)
+        {
+            int count = strList.Length;
+
+            _stringBuilder.Length = 0;
+
+            _stringBuilder.Append(str1);
+            for (int i = 0; i < count; i++)
+            {
+                _stringBuilder.Append(strList[i].ToString());
+            }
+
+            return _stringBuilder.ToString();
+        }
+    }
+
     public static string FastConcat(this string str1, string str2)
     {
         lock (_stringBuilder)
