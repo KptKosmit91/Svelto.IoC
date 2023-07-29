@@ -308,8 +308,30 @@ namespace Svelto.DataStructures
 
         public T this[int i]
         {
-            get { DesignByContract.Check.Require(i < _count, "out of bound index"); return _buffer[i]; }
-            set { DesignByContract.Check.Require(i < _count, "out of bound index"); _buffer[i] = value; }
+            get { if (i >= _count || i < 0) throw new IndexOutOfRangeException($"Attempted to get idx{i} in fasterlist of count {_count}"); return _buffer[i]; }
+            set { if (i >= _count || i < 0) throw new IndexOutOfRangeException($"Attempted to set idx{i} in fasterlist of count {_count}"); _buffer[i] = value; }
+        }
+
+        /// <summary>
+        /// Get the item at index <b>i</b> directly from the buffer. 
+        /// <para>Will not check against the Count of the list and thus may return an unused reference</para>
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public T UncheckedGet(int i)
+        {
+            return _buffer[i];
+        }
+
+        /// <summary>
+        /// Set the item at index <b>i</b> directly in the buffer. 
+        /// <para>Will not check against the Count of the list</para>
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public void UncheckedSet(int i, T value)
+        {
+            _buffer[i] = value;
         }
 
         public void Add(T item)
