@@ -166,7 +166,7 @@ namespace Utility
         }
 
         [Conditional("DEBUG")]
-        [Conditional("DEBUGPRINT")]
+        [Conditional("PRINTDEBUG")]
         [Conditional("UNITY_EDITOR")]
         public static void LogDebug(string txt)
         {
@@ -252,7 +252,7 @@ namespace Utility
         }
 
         [Conditional("DEBUG")]
-        [Conditional("DEBUGPRINT")]
+        [Conditional("PRINTDEBUG")]
         [Conditional("UNITY_EDITOR")]
         public static void LogWarningDebug(string txt)
         {
