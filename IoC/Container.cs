@@ -239,7 +239,7 @@ namespace Svelto.IoC
             }
             catch (Exception innerException)
             {
-                throw new InjectException("OnDependenciesInjected Crashes inside " + instanceToFullfill.GetType(), innerException);
+                throw new InjectException("OnDependenciesInjected Crashes inside ".FastConcat(instanceToFullfill.GetType().ToString()), innerException);
             }
         }
 
