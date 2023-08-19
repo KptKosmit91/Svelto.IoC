@@ -2,8 +2,8 @@
     "name": "Svelto.IoC.Unity",
     "rootNamespace": "Svelto.IoC.Unity",
     "references": [
-        "GUID:0da393ad63eec5b4eaaa30200afcdc7a",
-        "GUID:c2760c3224103f1419d0883ca1a3e1dd"
+        "DesignByContract",
+        "Svelto.IoC"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

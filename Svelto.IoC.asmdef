@@ -2,7 +2,7 @@
     "name": "Svelto.IoC",
     "rootNamespace": "Svelto.IoC",
     "references": [
-        "GUID:0da393ad63eec5b4eaaa30200afcdc7a"
+        "DesignByContract"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
