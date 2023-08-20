@@ -1,7 +1,10 @@
 Svelto IoC container for Unity 3D
 =====================================
 
-A fork of Svelto.IoC. The original is deprecated, but I am experimenting with some stuff here.
+A fork of Svelto.IoC. Not deprecated and updated.
+Made mostly with Unity in mind, but should work on other platforms.
+
+You'll want to remove the meta files for non-Unity use
 
 License
 =====================================
