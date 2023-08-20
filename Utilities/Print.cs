@@ -210,7 +210,7 @@ namespace Utility
             LogException(e, null);
         }
 
-        public static void LogException(Exception e, UnityEngine.Object obj)
+        public static void LogException(Exception e, UnityEngine.Object objContext)
         {
             string toPrint;
             string stackTrace;
@@ -232,7 +232,11 @@ namespace Utility
                 
             }
 
-            UnityEngine.Debug.LogException(e, obj);
+#if UNITY_5_3_OR_NEWER
+            UnityEngine.Debug.LogException(e, objContext);
+#else
+            System.Console.WriteLine(e.ToString());
+#endif
         }
 
         public static void LogWarning(string txt)
@@ -292,10 +296,10 @@ namespace Utility
                 toPrint = _stringBuilder.ToString();
             }
 
-#if !UNITY_EDITOR
-            System.Console.WriteLine(toPrint);
-#else
+#if UNITY_5_3_OR_NEWER
             UnityEngine.Debug.Log(toPrint);
+#else
+            System.Console.WriteLine(toPrint);
 #endif
         }
     }
