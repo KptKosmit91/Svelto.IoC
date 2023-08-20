@@ -1,3 +1,5 @@
+using System;
+
 namespace Svelto.IoC
 {
 	public interface IContainer
@@ -6,6 +8,7 @@ namespace Svelto.IoC
         void                    BindSelf<TContractor>() where TContractor:class, new();
 				
 		TContractor Build<TContractor>() where TContractor:class;
+		object		Build(Type contract);
 		void		Release<TContractor>() where TContractor:class;
 		
 		TContractor	Inject<TContractor>(TContractor instance);

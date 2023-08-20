@@ -1,49 +1,81 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
+using Svelto.Context;
 using Svelto.DataStructures;
+using Svelto.IoC.Plugins;
 
 namespace Svelto.IoC
 {
-    public class Container: IContainer, IInternalContainer
+    public class Container : IContainer, IInternalContainer
     {
-        public Container()
+        IContainerPlugin[] _plugins;
+
+        protected IContextNotifer _contextNotifier;
+
+        protected ContainerNotifierWrapper _notifierWrapper;
+
+        public Container(IContextNotifer contextNotifier, IContainerPlugin[] plugins)
         {
             _providers = ProviderBehaviour();
-            _cachedProperties = new Dictionary<Type, MemberInfo[]>();
             _delegateToSearchCriteria = DelegateToSearchCriteria;
+
+            if (plugins == null)
+            {
+                _plugins = new IContainerPlugin[0];
+            }
+            else
+            {
+                _plugins = plugins.Where(x => x != null).ToArray();
+            }
+
+            _notifierWrapper = new ContainerNotifierWrapper(this, _plugins);
+
+            if (contextNotifier != null)
+            {
+                _contextNotifier = contextNotifier;
+                _contextNotifier.AddFrameworkInitializationListener(_notifierWrapper);
+                _contextNotifier.AddFrameworkDestructionListener(_notifierWrapper);
+            }
         }
 
         //
         // IContainer interface
         //
 
-        public IBinder<TContractor> Bind<TContractor>() where TContractor:class
+        public IBinder<TContractor> Bind<TContractor>() where TContractor : class
         {
             IBinder<TContractor> binder = InternalBind<TContractor>();
 
             return binder;
         }
 
-        public void BindSelf<TContractor>() where TContractor:class, new()
+        public void BindSelf<TContractor>() where TContractor : class, new()
         {
             IBinder<TContractor> binder = InternalBind<TContractor>();
 
             binder.AsSingle<TContractor>();
         }
 
-        public TContractor Build<TContractor>() where TContractor:class
+        public TContractor Build<TContractor>() where TContractor : class
         {
             Type contract = typeof(TContractor);
 
-            TContractor instance = Get(contract) as TContractor;
+            return Build(contract) as TContractor;
+        }
+
+        public object Build(Type contract)
+        {
+            object instance = Get(contract);
 
             DesignByContract.Check.Ensure(instance != null, $"IoC.Container instance for type {contract} failed to be built (contractor not found - must be registered)");
 
             return instance;
         }
 
-        public void Release<TContractor>() where TContractor:class
+        public void Release<TContractor>() where TContractor : class
         {
             Type type = typeof(TContractor);
 
@@ -54,7 +86,7 @@ namespace Svelto.IoC
         {
             if (instance != null)
                 InternalInject(instance);
-                
+
             return instance;
         }
 
@@ -62,7 +94,7 @@ namespace Svelto.IoC
         // IInternalContainer interface
         //
 
-        public void Register<T, K>(Type type, K provider) where K:IProvider<T>
+        public void Register<T, K>(Type type, K provider) where K : IProvider<T>
         {
             _providers.Register<T>(type, provider);
         }
@@ -83,17 +115,35 @@ namespace Svelto.IoC
         /// <typeparam name="TContractor"></typeparam>
         /// <returns></returns>
 
-        protected virtual IBinder<TContractor> BinderProvider<TContractor>() where TContractor:class
+        protected virtual IBinder<TContractor> BinderProvider<TContractor>() where TContractor : class
         {
-            return new Binder<TContractor>();
+            return new ContainerBinder<TContractor>(OnTypeBound);
+        }
+
+        protected virtual void OnTypeBound(Type interfaceType, Type implementationType)
+        {
+            _plugins.ForeachPlugin(x => 
+            { 
+                x.OnTypeBound(interfaceType, implementationType); 
+            });
+
+            if (implementationType.InheritsType(typeof(IOnFrameworkInitialized))) // if (typeof(IOnFrameworkInitialized).IsAssignableFrom(implementationType))
+            {
+                _notifierWrapper.AddInitType(interfaceType);
+            }
+
+            if (implementationType.InheritsType(typeof(IOnFrameworkDestroyed))) // if (typeof(IOnFrameworkDestroyed).IsAssignableFrom(implementationType))
+            {
+                _notifierWrapper.AddDeInitType(interfaceType);
+            }
         }
 
         //
         // protected Members
         //
 
-        protected object Get(Type contract) 
-        {	
+        protected object Get(Type contract)
+        {
             return CreateDependency(contract, null, null);
         }
 
@@ -105,7 +155,7 @@ namespace Svelto.IoC
         /// <param name="instance"></param>
 
         protected virtual void OnInstanceGenerated<TContractor>(TContractor instance) where TContractor : class
-        {}
+        { }
 #if TO_COMPLETE
         void CallInjection(object injectable, MethodInfo info, Type contract)
         {
@@ -151,14 +201,14 @@ namespace Svelto.IoC
             return objMemberInfo.IsDefined((Type)objSearch, true);
         }
 
-        object InternalGet(Type contract, Type containerContract, PropertyInfo info) 
+        object InternalGet(Type contract, Type containerContract, PropertyInfo info)
         {
             return CreateDependency(contract, containerContract, info);
         }
 
         void InjectProperty(object instanceToFullfill, PropertyInfo info, Type contract)
         {
-            if (info.PropertyType == typeof (IContainer)) // self inject
+            if (info.PropertyType == typeof(IContainer)) // self inject
             {
 #if DEBUG || TESTBUILD
                 Utility.Console.LogWarning($"Inject containers automatically is considered a design error. [in {instanceToFullfill.GetType()}]");
@@ -212,15 +262,15 @@ namespace Svelto.IoC
 
             Type contract = instanceToFullfill.GetType();
             Type injectAttributeType = typeof(InjectAttribute);
-            
+
             MemberInfo[] properties = null;
 
             if (_cachedProperties.TryGetValue(contract, out properties) == false)
             {
-               
+
                 properties = contract.FindMembers(MemberTypes.Property,
-                                                    BindingFlags.SetProperty | 
-                                                    BindingFlags.Public | 
+                                                    BindingFlags.SetProperty |
+                                                    BindingFlags.Public |
                                                     BindingFlags.NonPublic |
                                                     BindingFlags.Instance,
                                                   _delegateToSearchCriteria, injectAttributeType);
@@ -243,11 +293,11 @@ namespace Svelto.IoC
             }
         }
 
-        readonly Dictionary<Type, MemberInfo[]>     _cachedProperties;
-        readonly MemberFilter                       _delegateToSearchCriteria;
-        readonly Type                               _weakReferenceType = typeof(DataStructures.WeakReference<>);
+        readonly Dictionary<Type, MemberInfo[]> _cachedProperties = new Dictionary<Type, MemberInfo[]>();
+        readonly MemberFilter _delegateToSearchCriteria;
+        readonly Type _weakReferenceType = typeof(DataStructures.WeakReference<>);
 
-        IProviderContainer                          _providers;
+        IProviderContainer _providers;
 
         public interface IProviderContainer
         {
@@ -256,10 +306,10 @@ namespace Svelto.IoC
             void Register<T>(Type type, IProvider<T> provider);
         }
 
-        sealed class ProviderContainer:IProviderContainer
+        sealed class ProviderContainer : IProviderContainer
         {
-            readonly Dictionary<Type, IProvider> 		_providers;
-            readonly Dictionary<Type, IProvider> 		_standardProvidersPerInstanceType;
+            readonly Dictionary<Type, IProvider> _providers;
+            readonly Dictionary<Type, IProvider> _standardProvidersPerInstanceType;
             public ProviderContainer()
             {
                 _providers = new Dictionary<Type, IProvider>();
@@ -287,45 +337,71 @@ namespace Svelto.IoC
                     if (_standardProvidersPerInstanceType.TryGetValue(instanceType, out standardProvider) == false)
                         standardProvider = _standardProvidersPerInstanceType[instanceType] = new WeakProviderDecorator<T>(provider); //this should be harmless and allows to query for unique providers        
 
-                    provider = ((WeakProviderDecorator<T>) standardProvider).provider;
+                    provider = ((WeakProviderDecorator<T>)standardProvider).provider;
                 }
 
                 _providers[type] = provider; //providers are normally saved by contract, not instance type
             }
 
-            readonly Type  _standardProviderType = typeof(StandardProvider<>);
+            readonly Type _standardProviderType = typeof(StandardProvider<>);
         }
 
         /// <summary>
         /// Use this class to register an interface
         /// or class into the container.
         /// </summary>
-        sealed class Binder<Contractor>: IBinder<Contractor> where Contractor:class
+        sealed class ContainerBinder<Contractor> : IBinder<Contractor> where Contractor : class
         {
-            public void Bind<ToBind>(IInternalContainer container) where ToBind:class
+            public delegate void RegisterCallback(Type interfaceType, Type implementationType);
+
+            private RegisterCallback _onTypeBound;
+
+            private IInternalContainer _container;
+
+            private Type _interfaceType;
+
+            public ContainerBinder(RegisterCallback onTypeBound)
+            {
+                DesignByContract.Check.Require(onTypeBound != null, "onRegister callback is null");
+
+                _onTypeBound = onTypeBound;
+            }
+
+            public void Bind<ToBind>(IInternalContainer container) where ToBind : class
             {
                 _container = container;
-
                 _interfaceType = typeof(ToBind);
             }
 
-            public void AsSingle<T>() where T:Contractor, new()
+            public void AsSingle<T>() where T : Contractor, new()
             {
                 _container.Register<T, StandardProvider<T>>(_interfaceType, new StandardProvider<T>());
+                OnTypeBound(typeof(T));
             }
 
             public void AsInstance<T>(T instance) where T : class, Contractor
             {
                 _container.Register<T, SelfProvider<T>>(_interfaceType, new SelfProvider<T>(instance));
+                OnTypeBound(typeof(T));
             }
 
-            public void ToProvider<T>(IProvider<T> provider) where T:class, Contractor
+            public void ToProvider<T>(IProvider<T> provider) where T : class, Contractor
             {
                 _container.Register<T, IProvider<T>>(_interfaceType, provider);
+                OnTypeBound(typeof(T));
             }
 
-            IInternalContainer          _container;
-            Type                        _interfaceType;
+            private void OnTypeBound(Type implementationType)
+            {
+                _onTypeBound(_interfaceType, implementationType);
+
+                /*
+                if (typeof(IOnFrameworkInitialized).IsAssignableFrom(implementationType) || typeof(IOnFrameworkDestroyed).IsAssignableFrom(implementationType))
+                {
+                    _onRegister(_interfaceType);
+                }
+                */
+            }
         }
     }
 }
