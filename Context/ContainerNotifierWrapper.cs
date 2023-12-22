@@ -19,13 +19,16 @@ namespace Svelto.Context
 
         IContainerPlugin[] _plugins;
 
+        IContextNotifer _contextNotifier;
+
         List<Type> _toInit = new List<Type>();
         List<Type> _toDeInit = new List<Type>();
 
-        public ContainerNotifierWrapper(IContainer container, IContainerPlugin[] containerPlugins)
+        public ContainerNotifierWrapper(IContainer container, IContainerPlugin[] containerPlugins, IContextNotifer contextNotifier)
         {
             _container = container;
             _plugins = containerPlugins;
+            _contextNotifier = contextNotifier;
         }
 
         public void AddInitType(Type type)
@@ -45,10 +48,14 @@ namespace Svelto.Context
                 x.OnFrameworkInitialized(_container);
             });
 
-            foreach (Type t in _toInit)
+            foreach (Type typeToInit in _toInit)
             {
-                var instance = _container.Build(t);
-                ((IOnFrameworkInitialized)instance).OnFrameworkInitialized();
+                var instance = _container.Build(typeToInit) as IOnFrameworkInitialized;
+
+                if (_contextNotifier == null || _contextNotifier.IsAwaitingInitialization(instance) == false)
+                {
+                    instance.OnFrameworkInitialized();
+                }
             }
 
             _toInit = null;
@@ -61,10 +68,14 @@ namespace Svelto.Context
                 x.OnFrameworkDestroyed(_container);
             });
 
-            foreach (Type t in _toDeInit)
+            foreach (Type typeToDeinit in _toDeInit)
             {
-                var instance = _container.Build(t);
-                ((IOnFrameworkDestroyed)instance).OnFrameworkDestroyed();
+                var instance = _container.Build(typeToDeinit) as IOnFrameworkDestroyed;
+
+                if (_contextNotifier == null || _contextNotifier.IsAwaitingDestruction(instance) == false)
+                {
+                    instance.OnFrameworkDestroyed();
+                }
             }
 
             _toDeInit = null;

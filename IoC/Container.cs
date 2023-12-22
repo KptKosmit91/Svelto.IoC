@@ -31,7 +31,7 @@ namespace Svelto.IoC
                 _plugins = plugins.Where(x => x != null).ToArray();
             }
 
-            _notifierWrapper = new ContainerNotifierWrapper(this, _plugins);
+            _notifierWrapper = new ContainerNotifierWrapper(this, _plugins, contextNotifier);
 
             if (contextNotifier != null)
             {
@@ -127,12 +127,12 @@ namespace Svelto.IoC
                 x.OnTypeBound(interfaceType, implementationType); 
             });
 
-            if (implementationType.InheritsType(typeof(IOnFrameworkInitialized))) // if (typeof(IOnFrameworkInitialized).IsAssignableFrom(implementationType))
+            if (implementationType.InheritsType(typeof(IOnFrameworkInitialized)))
             {
                 _notifierWrapper.AddInitType(interfaceType);
             }
 
-            if (implementationType.InheritsType(typeof(IOnFrameworkDestroyed))) // if (typeof(IOnFrameworkDestroyed).IsAssignableFrom(implementationType))
+            if (implementationType.InheritsType(typeof(IOnFrameworkDestroyed)))
             {
                 _notifierWrapper.AddDeInitType(interfaceType);
             }

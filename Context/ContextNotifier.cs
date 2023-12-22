@@ -18,8 +18,10 @@ namespace Svelto.Context
         {
             DesignByContract.Check.Require(obj != null, "Attempted to add null framework initialization listener");
 
+            var refToInit = new WeakReferenceI(obj);
+
             if (_toInitialize != null)
-                _toInitialize.Add(new WeakReferenceI(obj));
+                _toInitialize.Add(refToInit);
             else
                 throw new ContextException("An object is expected to be initialized after the framework has been initialized. Type: ".FastConcat(obj.GetType().ToString()));
         }
@@ -28,10 +30,26 @@ namespace Svelto.Context
         {
             DesignByContract.Check.Require(obj != null, "Attempted to add null framework destruction listener");
 
+            var refToDeInit = new WeakReferenceD(obj);
+
             if (_toDeinitialize != null)
-                _toDeinitialize.Add(new WeakReferenceD(obj));
+                _toDeinitialize.Add(refToDeInit);
             else
                 throw new ContextException("An object is expected to be deinitialized after the framework has been deinitialized. Type: ".FastConcat(obj.GetType().ToString()));
+        }
+
+        public bool IsAwaitingInitialization(IOnFrameworkInitialized obj)
+        {
+            var refToInit = new WeakReferenceI(obj);
+
+            return _toInitialize.Contains(refToInit);
+        }
+
+        public bool IsAwaitingDestruction(IOnFrameworkDestroyed obj)
+        {
+            var refToDeInit = new WeakReferenceD(obj);
+
+            return _toDeinitialize.Contains(refToDeInit);
         }
 
         /// <summary>
