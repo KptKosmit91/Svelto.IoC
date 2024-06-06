@@ -1,10 +1,4 @@
-﻿using Svelto.IoC.Plugins;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor.VersionControl;
+﻿using System;
 
 namespace Svelto.IoC.Plugins
 {
