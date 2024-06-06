@@ -52,7 +52,7 @@ namespace Svelto.Context
             {
                 var instance = _container.Build(typeToInit) as IOnFrameworkInitialized;
 
-                if (_contextNotifier == null || _contextNotifier.IsAwaitingInitialization(instance) == false)
+                if (_contextNotifier == null || _contextNotifier.IsAwaitingInitialization(instance) == false) // this is here so we don't init/deinit an object multiple times incase it was already added by different logic
                 {
                     instance.OnFrameworkInitialized();
                 }
@@ -72,7 +72,7 @@ namespace Svelto.Context
             {
                 var instance = _container.Build(typeToDeinit) as IOnFrameworkDestroyed;
 
-                if (_contextNotifier == null || _contextNotifier.IsAwaitingDestruction(instance) == false)
+                if (_contextNotifier == null || _contextNotifier.IsAwaitingDestruction(instance) == false) // this is here so we don't init/deinit an object multiple times incase it was already added by different logic
                 {
                     instance.OnFrameworkDestroyed();
                 }
