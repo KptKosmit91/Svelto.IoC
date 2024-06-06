@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,12 +11,11 @@ namespace Svelto.Context
             _prefabs = new Dictionary<string, GameObject[]>();
         }
 
-        public GameObject Build(string prefabName)
+        public GameObject Build(string prefabName, Action<GameObject> preInit = null)
         {
             DesignByContract.Check.Require(_prefabs.ContainsKey(prefabName), "Svelto.Factories.IGameObjectFactory -prefab was not found: " + prefabName);
 
-            var go = Build(_prefabs[prefabName][0]);
-
+            var go = Build(_prefabs[prefabName][0], preInit);
             GameObject parent = _prefabs[prefabName][1];
 
             if (parent != null)
@@ -38,11 +38,12 @@ namespace Svelto.Context
             return go;
         }
         
-        virtual public GameObject Build(GameObject prefab)
+        virtual public GameObject Build(GameObject prefab, Action<GameObject> preInit = null)
         {
             DesignByContract.Check.Require(prefab != null, "Svelto.Factories.IGameObjectFactory -null prefab");
 
-            var copy = Object.Instantiate(prefab) as GameObject;
+            var copy = GameObject.Instantiate(prefab) as GameObject;
+            preInit?.Invoke(copy);
 
             return copy;
         }

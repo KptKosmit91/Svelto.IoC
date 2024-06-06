@@ -1,5 +1,6 @@
 ﻿using Svelto.Context.Unity.Internal;
 using Svelto.IoC;
+using System;
 using UnityEngine;
 
 namespace Svelto.Context.Unity
@@ -21,11 +22,11 @@ namespace Svelto.Context.Unity
             _mbRoot = monoBehaviourRoot;
         }
 
-        override public GameObject Build(GameObject prefab)
+        override public GameObject Build(GameObject prefab, Action<GameObject> preInit = null)
         {
             DesignByContract.Check.Require(prefab != null, "Svelto.Factories.IGameObjectFactory -null prefab");
 
-            var copy =  base.Build(prefab);
+            var copy = base.Build(prefab, preInit);
             var monobehaviours = copy.GetComponentsInChildren<MonoBehaviour>(includeInactive: true);
 
             int len = monobehaviours.Length;
