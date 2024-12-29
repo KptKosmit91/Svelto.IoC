@@ -1,4 +1,5 @@
 using Svelto.Unity.Log;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -23,20 +24,26 @@ namespace Svelto.Context.Unity
     {
         protected override void OnAwake()
         {
-            _root = new T();
-
-            _root.OnContextCreated(this);
-        }
-
-        void OnDestroy()
-        {
-            _root.OnContextDestroyed();
+            try
+            {
+                _root = new T();
+                _root.OnContextCreated(this);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(new ContextException($"Failure initializing context.", e));
+            }
         }
 
         void Start()
         {
             if (Application.isPlaying == true)
                 StartCoroutine(WaitForFrameworkInitialization());
+        }
+
+        void OnDestroy()
+        {
+            _root.OnContextDestroyed();
         }
 
         IEnumerator WaitForFrameworkInitialization()
